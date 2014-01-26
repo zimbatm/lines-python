@@ -49,9 +49,22 @@ class Log(object):
         self.context = OrderedDict(context)
 
     def log(self, msg=None, **kwargs):
-        obj = prepare_obj(msg, kwargs)
+        obj = self.__prepare_obj(msg, kwargs)
         for output in self.outputs:
             output.output(obj)
+
+    def __prepare_obj(self, msg, kwargs):
+        obj = copy(self.context)
+        if msg != None:
+            obj['msg'] = msg
+        obj.update(kwargs)
+
+        for k in obj.keys():
+            v = obj[k]
+            if type(v) == FN_TYPE:
+                obj[k] = v()
+
+        return obj
 
 def to_output(*outputs):
     x = []
@@ -71,20 +84,6 @@ def to_output(*outputs):
         else:
             raise 'Unknown outputter'
     return x
-
-def prepare_obj(msg, kwargs):
-    obj = OrderedDict()
-    if msg != None:
-        obj['msg'] = msg
-    obj.update(kwargs)
-
-    for k in obj.keys():
-        v = obj[k]
-        if type(v) == FN_TYPE:
-            obj[k] = v()
-
-    return obj
-
 
 PRI2SYSLOG = {
     'emerg': syslog.LOG_EMERG,
