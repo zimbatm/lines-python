@@ -18,22 +18,6 @@ DUMPER = None
 
 LOG = None
 
-# TODO: Make sure this is nice to use
-# class context(object):
-#     def __init__(self, **context):
-#         self.context = OrderedDict(context)
-
-#     def __enter__(self):
-#         # Setup things
-#         pass
-
-#     def __exit__(self, type, value, traceback):
-#         # Tear things down
-#         pass
-
-#     def log(self, msg=None, **kwargs):
-#         log(msg, **self.context.merge(kwargs))
-
 
 def setup(output=None, context=None):
     global LOG
@@ -52,15 +36,20 @@ class Log(object):
         self.context = OrderedDict(context)
 
     def log(self, msg=None, **kwargs):
-        obj = self.__prepare_obj(msg, kwargs)
+        d = self.__prepare_dict(msg, kwargs)
+        self.log_dict(d)
+
+    def log_dict(self, d):
+        obj = OrderedDict(self.context)
+        obj.update(d)
         for output in self.outputs:
             output.output(obj)
 
-    # def context(self, **kwargs):
-    #     return LogContext(self, kwargs)
+    def context(self, **kwargs):
+        return LogContext(self, kwargs)
 
     def __prepare_obj(self, msg, kwargs):
-        obj = copy(self.context)
+        obj = OrderedDict()
         if msg is not None:
             obj['msg'] = msg
         obj.update(kwargs)
@@ -73,18 +62,25 @@ class Log(object):
         return obj
 
 
-# class LogContext(object):
-#     def __init__(self, log, context):
-#         self.log = log
-#         self.context = OrderedDict(context)
+class LogContext(object):
+    def __init__(self, log, context):
+        self.log = log
+        self.context = OrderedDict(context)
 
-#     def log(self, msg=None, **kwargs):
-#         # TODO
-#         pass
+    def log(self, msg=None, **kwargs):
+        d = copy(self.context)
+        self.log.log_dict(d)
 
-#     def context(self, **kwargs):
-#         # TODO
-#         pass
+    def context(self, **kwargs):
+        context = copy(self.context)
+        context.update(kwargs)
+        return LogContext(self.log, context)
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type, value, traceback):
+        pass
 
 
 def to_output(*outputs):
