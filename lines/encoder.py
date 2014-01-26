@@ -17,6 +17,8 @@ RE_LITERAL = re_compile(r'[\s\'"=:{}\[\]]')
 def dumps(obj, max_depth=4):
     return objenc_internal(obj, max_depth)
 
+### Private stuff ###
+
 def objenc_internal(obj, max_depth):
     max_depth -= 1
     if max_depth < 0:
@@ -30,36 +32,22 @@ def keyenc(k, *_):
     else:
         return strenc(str(k))
 
-def valmap(t):
-    # TODO: Use a dict for the mapping ?
-    # TODO: missing types:
-    #  * range
-    #  * ...
-    if t == dict:
-        return objenc
-    elif t == list or t == set or t == tuple:
-        return arrenc
-    elif t == str:
-        return strenc
-    elif t == int or t == float or t == complex:
-        return numenc
-    elif t == bool:
-        return boolenc
-    else:
-        return litenc
-
 def valenc(x, max_depth):
     if x == None:
         return LIT_NIL
-    else:
-        return valmap(type(x))(x, max_depth)
+    
+    for t in type(x).__mro__:
+        if t in MAPPING:
+            return MAPPING[t](x, max_depth)
+
+    raise 'BUG, object should be ancestor of all'
 
 def objenc(x, max_depth):
   return OPEN_BRACE + objenc_internal(x, max_depth) + SHUT_BRACE
 
 def arrenc(a, max_depth):
   max_depth -= 1
-  # TODO: Restore num + unit thing ?
+  # TODO: Restore num + unit thing, when a tuple of two elements ?
   # # num + unit. Eg: 3ms
   # if a.size == 2 && a.first.kind_of?(Numeric) && is_literal?(a.last.to_s)
   #   "#{numenc(a.first)}:#{strenc(a.last)}"
@@ -114,3 +102,17 @@ def litenc(x, _):
 
 def is_literal(s):
   return (RE_LITERAL.search(s) == None)
+
+
+MAPPING = {
+    bool: boolenc,
+    complex: numenc,
+    dict: objenc,
+    float: numenc,
+    int: numenc,
+    list: arrenc,
+    object: litenc,
+    set: arrenc,
+    str: strenc,
+    tuple: arrenc,
+}

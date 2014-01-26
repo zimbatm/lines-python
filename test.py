@@ -9,9 +9,14 @@ class TestEncoder(unittest.TestCase):
     def test_simple(self):
         self.t('foo=bar', foo='bar')
 
-    def test_bool(self):
-        # NOOOOOOOOOO!, the order or kwargs is not kept
-        self.t('foo=#t bar=#f baz=nil', foo=True, bar=False, baz=None)
+    def test_quoted(self):
+        self.t("foo='bar baz'", foo='bar baz')
+        self.t('foo="bar\'baz"', foo="bar'baz")
+
+    def test_bool_nil(self):
+        self.t('foo=nil', foo=None)
+        self.t('foo=#t',  foo=True)
+        self.t('foo=#f',  foo=False)
 
     def test_empty_string(self):
         self.t('foo=', foo='')
@@ -23,6 +28,9 @@ class TestEncoder(unittest.TestCase):
 
     def test_lists(self):
         self.t('foo=[1 2 a]', foo=[1,2,'a'])
+
+    def test_dict(self):
+        self.t('x={y=3}', x=dict(y=3))
 
     def test_max_depth(self):
         x = dict()
