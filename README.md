@@ -26,3 +26,5 @@ Add logging adapter
 Handle exception formatting
 
 Mapping for datetime.timedelta
+
+Investigate http://docs.python.org/2/library/types.html for encoding mapping

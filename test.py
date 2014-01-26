@@ -9,6 +9,7 @@ class TestEncoder(unittest.TestCase):
 
     def test_simple(self):
         self.t('foo=bar', foo='bar')
+        self.t('foo=bar', foo=u'bar')
 
     def test_quoted(self):
         self.t("foo='bar baz'", foo='bar baz')

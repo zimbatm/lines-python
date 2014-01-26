@@ -21,10 +21,10 @@ def objenc_internal(obj, max_depth):
 
 
 def keyenc(obj, *_):
-    if type(obj) == str:
+    if type(obj) == str or type(obj) == unicode:
         return strenc(obj)
     else:
-        return strenc(str(obj))
+        return strenc(repr(obj))
 
 
 def valenc(obj, max_depth):
@@ -85,6 +85,8 @@ RE_LITERAL = re_compile(r'[\s\'"=:{}\[\]]')
 
 TYPE_MAP = {
     complex: numenc,
+    date: timeenc,
+    datetime: timeenc,
     dict: objenc,
     float: numenc,
     int: numenc,
@@ -93,7 +95,6 @@ TYPE_MAP = {
     set: arrenc,
     str: strenc,
     time: timeenc,
-    date: timeenc,
-    datetime: timeenc,
     tuple: arrenc,
+    unicode: strenc,
 }
