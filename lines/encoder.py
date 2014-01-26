@@ -1,4 +1,7 @@
 from re import compile as re_compile
+from datetime import date
+from datetime import time
+from datetime import datetime
 
 SPACE = ' '
 LIT_TRUE = '#t'
@@ -83,22 +86,11 @@ def numenc(n, _):
   #end
 
 def litenc(x, _):
-  # klass = (x.class.ancestors & mapping.keys).first
-  # TODO: support mapping
-  # if klass
-  #   mapping[klass].call(x)
-  # else
     return strenc(repr(x))
-# rescue
-#   klass = (class << x; self; end).ancestors.first
-#   strenc("#<#{klass}:0x#{x.__id__.to_s(16)}>")
-# end
 
-# def timeenc(t)
-#   t.utc.iso8601
-
-# def dateenc(d)
-#   d.iso8601
+def timeenc(x, _):
+    # FIXME: TZ needs to be appended to the output string
+    return x.isoformat()
 
 def is_literal(s):
   return (RE_LITERAL.search(s) == None)
@@ -114,5 +106,8 @@ MAPPING = {
     object: litenc,
     set: arrenc,
     str: strenc,
+    time: timeenc,
+    date: timeenc,
+    datetime: timeenc,
     tuple: arrenc,
 }

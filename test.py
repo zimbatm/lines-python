@@ -1,4 +1,5 @@
 import unittest
+import datetime
 
 from lines.encoder import dumps
 
@@ -31,6 +32,11 @@ class TestEncoder(unittest.TestCase):
 
     def test_dict(self):
         self.t('x={y=3}', x=dict(y=3))
+
+    def test_time(self):
+        time = datetime.datetime.utcfromtimestamp(1337)
+        # FIXME: TZ is never appended to the output string
+        self.t('foo=1970-01-01T00:22:17', foo=time)
 
     def test_max_depth(self):
         x = dict()

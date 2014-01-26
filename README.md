@@ -22,3 +22,7 @@ Add log contextes
 
 Add logging output
 Add logging adapter
+
+Handle exception formatting
+
+Mapping for datetime.timedelta
