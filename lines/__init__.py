@@ -1,6 +1,6 @@
-from encoder import dumps
-from logging import log
-from logging import setup
+from lines.encoder import dumps
+from lines.logging import log
+from lines.logging import setup
 
 __all__ = [
     'dumps',

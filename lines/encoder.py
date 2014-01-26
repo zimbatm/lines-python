@@ -39,7 +39,7 @@ def valenc(obj, max_depth):
         if t in TYPE_MAP:
             return TYPE_MAP[t](obj, max_depth)
 
-    raise 'BUG'
+    raise TypeError("BUG")
 
 
 def objenc(obj, max_depth):
@@ -50,8 +50,8 @@ def arrenc(obj, max_depth):
     max_depth -= 1
     # TODO: Restore num + unit thing, when a tuple of two elements ?
     # # num + unit. Eg: 3ms
-    if type(obj) == tuple and len(obj) == 2:
-        return "%s:%s" % (numenc(obj[0]), strenc(obj[1]))
+    # if type(obj) == tuple and len(obj) == 2:
+    #     return "%s:%s" % (numenc(obj[0]), strenc(obj[1]))
 
     if max_depth < 0:
         return '[...]'
@@ -79,7 +79,7 @@ def timeenc(obj, _):
 
 
 def is_literal(s):
-    return (RE_LITERAL.search(s) is None)
+    return RE_LITERAL.search(s) is None
 
 RE_LITERAL = re_compile(r'[\s\'"=:{}\[\]]')
 

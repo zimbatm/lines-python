@@ -7,7 +7,7 @@ from os.path import basename
 from collections import OrderedDict
 from itertools import chain
 
-from encoder import dumps
+from lines.encoder import dumps
 
 NL = "\n"
 FN_TYPE = type(lambda: 1)
@@ -35,9 +35,9 @@ LOG = None
 #         log(msg, **self.context.merge(kwargs))
 
 
-def setup(output=[], context={}):
+def setup(output=None, context=None):
     global LOG
-    LOG = Log(output, context)
+    LOG = Log(output or [], context or {})
 
 
 def log(msg=None, **kwargs):
@@ -56,6 +56,9 @@ class Log(object):
         for output in self.outputs:
             output.output(obj)
 
+    # def context(self, **kwargs):
+    #     return LogContext(self, kwargs)
+
     def __prepare_obj(self, msg, kwargs):
         obj = copy(self.context)
         if msg is not None:
@@ -68,6 +71,20 @@ class Log(object):
                 obj[k] = v()
 
         return obj
+
+
+# class LogContext(object):
+#     def __init__(self, log, context):
+#         self.log = log
+#         self.context = OrderedDict(context)
+
+#     def log(self, msg=None, **kwargs):
+#         # TODO
+#         pass
+
+#     def context(self, **kwargs):
+#         # TODO
+#         pass
 
 
 def to_output(*outputs):
@@ -86,7 +103,7 @@ def to_output(*outputs):
         elif output == 'syslog':
             x.append(SyslogOutput(syslog))
         else:
-            raise 'Unknown outputter'
+            raise TypeError('Unknown outputter')
     return x
 
 PRI2SYSLOG = {
@@ -104,8 +121,8 @@ PRI2SYSLOG = {
 
 
 class SyslogOutput(object):
-    def __init__(self, syslog=syslog):
-        self.syslog = syslog
+    def __init__(self, syslog_=syslog):
+        self.syslog = syslog_
         self.opened = False
 
     def output(self, obj):
@@ -136,8 +153,8 @@ class SyslogOutput(object):
 
 
 class FileOutput(object):
-    def __init__(self, file):
-        self.file = file
+    def __init__(self, file_):
+        self.file = file_
 
     def output(self, obj):
         data = dumps(obj) + NL
