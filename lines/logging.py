@@ -34,12 +34,15 @@ LOG = None
 #     def log(self, msg=None, **kwargs):
 #         log(msg, **self.context.merge(kwargs))
 
+
 def setup(output=[], context={}):
     global LOG
     LOG = Log(output, context)
 
+
 def log(msg=None, **kwargs):
     LOG.log(msg, **kwargs)
+
 
 ### Private stuff ###
 
@@ -55,7 +58,7 @@ class Log(object):
 
     def __prepare_obj(self, msg, kwargs):
         obj = copy(self.context)
-        if msg != None:
+        if msg is not None:
             obj['msg'] = msg
         obj.update(kwargs)
 
@@ -65,6 +68,7 @@ class Log(object):
                 obj[k] = v()
 
         return obj
+
 
 def to_output(*outputs):
     x = []
@@ -98,6 +102,7 @@ PRI2SYSLOG = {
     'debug': syslog.LOG_DEBUG,
 }
 
+
 class SyslogOutput(object):
     def __init__(self, syslog=syslog):
         self.syslog = syslog
@@ -122,11 +127,13 @@ class SyslogOutput(object):
         if not app_name:
             app_name = basename(argv[0])
 
-        self.syslog.openlog(app_name,
-                syslog.LOG_PID | syslog.LOG_CONS | syslog.LOG_NDELAY,
-                syslog.LOG_USER)
+        self.syslog.openlog(
+            app_name,
+            syslog.LOG_PID | syslog.LOG_CONS | syslog.LOG_NDELAY,
+            syslog.LOG_USER)
 
         self.opened = True
+
 
 class FileOutput(object):
     def __init__(self, file):
